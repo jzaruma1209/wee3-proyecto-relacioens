@@ -2,6 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../utils/connection");
 
 const Actors = sequelize.define("actors", {
+  //aqui esta mal porque debe de ir en singular actor y ya en la base de datos automanticament ese pasa a plural
   firstName: {
     type: DataTypes.STRING,
     allowNull: false,

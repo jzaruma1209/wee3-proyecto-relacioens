@@ -5,7 +5,9 @@ const genres = require("../models/genres");
 const directors = require("../models/Directors");
 
 const getAll = catchError(async (req, res) => {
-  const results = await movies.findAll({ include: [genres, actors, directors] });
+  const results = await movies.findAll({
+    include: [genres, actors, directors],
+  });
   return res.json(results);
 });
 
@@ -38,22 +40,32 @@ const update = catchError(async (req, res) => {
   return res.json(result[1][0]);
 });
 
-
 const setMovies = catchError(async (req, res) => {
+  //1) localizar la pelicula
+  const { id } = req.params;
+  const movies_01 = await movies.findByPk(id);
+  //2 setear los actores a las peliculas localizadas// se debe de hacer copiando el nombre del model para que este funcionen con camelcase y en plural
+  await movies_01.setActors(req.body); //este seteo es asincrono por eso debe ir el await
+  //3 obtener los cursos seteados
+  const actores = await movies_01.getActors();
+  return res.json(actores);
+});
 
-  //1) localizar la pelicula 
-  const { id } = req.params
-  const movie = await movies.findByPk(id)
-  /*
-    //2) setear los actores a  las peliculas localizadas, se usa el nombre del modelo al cual vemos a setear en este caso es el del actor 
-    await movies.setActors(req.body)
-  
-    //3) obtener los cursos seteado 
-    const actors = await movies.getActors()
-  */
-  // return res.json(actors)
-  return res.json(id)
-})
+const setGenres = catchError(async (req, res) => {
+  const { id } = req.params;
+  const genres_01 = await movies.findByPk(id);
+  await genres_01.setGenres(req.body);
+  const generos = await genres_01.getGenres();
+  return res.json(generos);
+});
+
+const setDirectors = catchError(async (req, res) => {
+  const { id } = req.params;
+  const directors_01 = await movies.findByPk(id);
+  await directors_01.setDirectors(req.body);
+  const directores = await directors_01.getDirectors();
+  return res.json(directores);
+});
 
 module.exports = {
   getAll,
@@ -61,5 +73,7 @@ module.exports = {
   getOne,
   remove,
   update,
-  setMovies
+  setMovies,
+  setGenres,
+  setDirectors,
 };
